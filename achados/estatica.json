@@ -1,0 +1,129 @@
+[
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 2,
+    "ferramentas": [
+      "bandit"
+    ],
+    "regras": [
+      "B403"
+    ],
+    "mensagem_principal": "Consider possible security implications associated with pickle module.",
+    "severidade": "low",
+    "trecho": "1 import os\n2 import pickle\n3 import sqlite3"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 7,
+    "ferramentas": [
+      "bandit",
+      "regra_propria"
+    ],
+    "regras": [
+      "B105",
+      "segredo_hardcoded"
+    ],
+    "mensagem_principal": "Possible hardcoded password: 'SenhaSuperSecreta123'",
+    "severidade": "alta",
+    "trecho": "6 API_KEY = \"DEMO_CHAVE_FALSA_PARA_TESTE_12345\"\n7 DB_PASSWORD = \"SenhaSuperSecreta123\"\n8"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 12,
+    "ferramentas": [
+      "bandit"
+    ],
+    "regras": [
+      "B608"
+    ],
+    "mensagem_principal": "Possible SQL injection vector through string-based query construction.",
+    "severidade": "medium",
+    "trecho": "11     # Falha 2: SQL Injection via concatenação de string (não parametrizado)\n12     query = \"SELECT * FROM usuarios WHERE id = '\" + id_usuario + \"'\"\n13     cursor = conexao.cursor()"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 20,
+    "ferramentas": [
+      "bandit",
+      "semgrep",
+      "regra_propria"
+    ],
+    "regras": [
+      "B307",
+      "python.lang.security.audit.eval-detected.eval-detected",
+      "eval_exec_detectado"
+    ],
+    "mensagem_principal": "Use of possibly insecure function - consider using safer ast.literal_eval.",
+    "severidade": "alta",
+    "trecho": "19     # Falha 3: eval() em entrada vinda do usuário\n20     resultado = eval(expressao_usuario)\n21     return resultado"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 26,
+    "ferramentas": [
+      "bandit",
+      "semgrep"
+    ],
+    "regras": [
+      "B301",
+      "python.lang.security.deserialization.pickle.avoid-pickle"
+    ],
+    "mensagem_principal": "Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.",
+    "severidade": "medium",
+    "trecho": "25     # Falha 4: deserialização insegura de dado não confiável\n26     preferencias = pickle.loads(dados_serializados)\n27     return preferencias"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 32,
+    "ferramentas": [
+      "bandit",
+      "regra_propria"
+    ],
+    "regras": [
+      "B605",
+      "comando_shell_concatenado"
+    ],
+    "mensagem_principal": "Starting a process with a shell, possible injection detected, security issue.",
+    "severidade": "high",
+    "trecho": "31     # Falha 5: injeção de comando via os.system\n32     os.system(\"cat \" + nome_arquivo)"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 14,
+    "ferramentas": [
+      "semgrep"
+    ],
+    "regras": [
+      "python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query"
+    ],
+    "mensagem_principal": "Avoiding SQL string concatenation: untrusted input concatenated with raw SQL query can result in SQL Injection. In order to execute raw query safely, prepared statement should be used. SQLAlchemy provides TextualSQL to easily used prepared statement with named parameters. For complex SQL composition, use SQL Expression Language or Schema Definition Language. In most cases, SQLAlchemy ORM will be a better option.",
+    "severidade": "error",
+    "trecho": "requires login"
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 6,
+    "ferramentas": [
+      "regra_propria"
+    ],
+    "regras": [
+      "segredo_hardcoded"
+    ],
+    "mensagem_principal": "Possível segredo (chave/senha/token) codificado diretamente no arquivo",
+    "severidade": "alta",
+    "trecho": "API_KEY = \"DEMO_CHAVE_FALSA_PARA_TESTE_12345\""
+  },
+  {
+    "arquivo": "exemplo_vulneravel/app.py",
+    "linha": 19,
+    "ferramentas": [
+      "regra_propria"
+    ],
+    "regras": [
+      "eval_exec_detectado"
+    ],
+    "mensagem_principal": "Uso de eval()/exec() — pode executar código arbitrário se a entrada vier do usuário",
+    "severidade": "alta",
+    "trecho": "# Falha 3: eval() em entrada vinda do usuário"
+  }
+]

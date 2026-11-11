@@ -1,0 +1,17 @@
+[
+  {
+    "tipo": "xss_refletido",
+    "parametro": "name",
+    "payload": "<script>window.__xss_hit = true;</script>",
+    "evidencia": "window.__xss_hit foi definida como true após a requisição — o script foi executado de verdade pelo navegador, não só refletido como texto",
+    "severidade": "alta"
+  },
+  {
+    "tipo": "xss_armazenado",
+    "parametro": "mtxMessage",
+    "payload": "<script>window.__xss_hit_stored = true;</script>",
+    "evidencia": "A variável continuou true após recarregar a página do zero, sem reenviar o formulário — confirma persistência (diferencia de refletido)",
+    "severidade": "critica",
+    "screenshot": "evidencias/xss_armazenado.png"
+  }
+]

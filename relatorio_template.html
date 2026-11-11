@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: Arial, sans-serif; margin: 40px; color: #222; }
+  h1 { color: #b30000; border-bottom: 2px solid #b30000; }
+  h2 { color: #333; margin-top: 30px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 13px; }
+  th { background: #f2f2f2; }
+  .severidade-baixa { color: #555; }
+  .severidade-media { color: #b36b00; font-weight: bold; }
+  .severidade-alta { color: #b30000; font-weight: bold; }
+  .severidade-critica { color: #fff; background: #b30000; font-weight: bold; padding: 1px 6px; border-radius: 3px; }
+  code { background: #f5f5f5; padding: 1px 4px; }
+</style>
+</head>
+<body>
+  <h1>Trabalho Prático — SIN 451 Segurança da Informação</h1>
+  <p><strong>Ferramenta:</strong> Scanner de Vulnerabilidades Web + Análise Estática</p>
+
+  <h2>1. Descrição da ferramenta</h2>
+  <p>Ferramenta própria em Python composta por três módulos independentes: um scanner de SQL Injection,
+  um scanner de XSS (refletido e armazenado) e um analisador de código estático que combina Bandit,
+  Semgrep e regras próprias. Os dois primeiros testam o DVWA (Damn Vulnerable Web Application) em
+  ambiente controlado via Docker; o terceiro analisa um código-fonte de exemplo com falhas propositais.</p>
+
+  <h2>2. Metodologia</h2>
+  <p>SQL Injection: login automatizado via <code>requests</code>, envio de payloads classificados
+  (baseados em erro, booleanos e baseados em tempo) e comparação de respostas contra um baseline.
+  XSS: automação via Selenium, confirmando execução real de JavaScript no navegador (não apenas
+  reflexo no HTML) e persistência para o caso armazenado. Análise estática: execução do Bandit e
+  do Semgrep sobre o código-alvo, mais três regras próprias (segredo hardcoded, comando de shell
+  concatenado, uso de eval/exec), com mesclagem dos achados por arquivo e linha.</p>
+
+  <h2>3. Falhas exploradas e evidências</h2>
+
+  <h3>3.1 SQL Injection ({{ sqli|length }} achado(s))</h3>
+  <table>
+    <tr><th>Tipo</th><th>Payload</th><th>Evidência</th><th>Severidade</th></tr>
+    {% for f in sqli %}
+    <tr>
+      <td>{{ f.tipo_label or f.tipo }}</td>
+      <td><code>{{ f.payload }}</code></td>
+      <td>{{ f.evidencia }}</td>
+      <td class="severidade-{{ f.severidade }}">{{ f.severidade }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h3>3.2 XSS ({{ xss|length }} achado(s))</h3>
+  <table>
+    <tr><th>Tipo</th><th>Payload</th><th>Evidência</th><th>Severidade</th></tr>
+    {% for f in xss %}
+    <tr>
+      <td>{{ f.tipo_label or f.tipo }}</td>
+      <td><code>{{ f.payload }}</code></td>
+      <td>{{ f.evidencia }}{% if f.screenshot %}<br><img src="{{ f.screenshot }}" style="max-width:320px;border:1px solid #ccc;margin-top:6px;">{% endif %}</td>
+      <td class="severidade-{{ f.severidade }}">{{ f.severidade }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h3>3.3 Análise estática ({{ estatica|length }} achado(s))</h3>
+  <table>
+    <tr><th>Arquivo:Linha</th><th>Ferramentas</th><th>Mensagem</th><th>Severidade</th></tr>
+    {% for f in estatica %}
+    <tr>
+      <td>{{ f.arquivo }}:{{ f.linha }}</td>
+      <td>{{ f.ferramentas|join(', ') }}</td>
+      <td>{{ f.mensagem_principal }}</td>
+      <td class="severidade-{{ f.severidade }}">{{ f.severidade }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>4. Impacto e consequências</h2>
+  <p>SQL Injection permite ler, alterar ou apagar dados do banco sem autorização, incluindo contornar
+  autenticação. XSS permite executar código no navegador de outras vítimas — o armazenado é mais grave
+  por não depender de a vítima clicar em nada. As falhas de código (segredos expostos, eval/exec,
+  deserialização insegura) permitem, respectivamente, acesso indevido a serviços externos, execução de
+  código arbitrário a partir de entrada do usuário e execução de código via objetos manipulados.</p>
+
+  <h2>5. Medidas de mitigação</h2>
+  <ul>
+    <li><strong>SQL Injection:</strong> usar queries parametrizadas/prepared statements, nunca concatenar entrada do usuário na query.</li>
+    <li><strong>XSS:</strong> escapar toda saída renderizada no HTML e adotar uma Content-Security-Policy.</li>
+    <li><strong>Segredos no código:</strong> mover para variáveis de ambiente/secret manager e rodar scanner de segredos no CI.</li>
+    <li><strong>eval/exec:</strong> substituir por alternativas seguras como <code>ast.literal_eval</code> quando possível.</li>
+    <li><strong>Deserialização insegura:</strong> evitar <code>pickle</code> para dados não confiáveis; usar JSON.</li>
+  </ul>
+
+  <h2>6. Conclusão</h2>
+  <p>A ferramenta identificou com sucesso {{ sqli|length + xss|length + estatica|length }} achados
+  distribuídos entre os três tipos de falha exigidos, com evidências reproduzíveis (requisições,
+  comparações de resposta e screenshots) e lógica de detecção própria em cada módulo, reduzindo a
+  dependência de ferramentas prontas e de falsos positivos.</p>
+
+</body>
+</html>
